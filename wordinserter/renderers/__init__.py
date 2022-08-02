@@ -74,8 +74,12 @@ class BaseRenderer(abc.ABC):
         with self.with_hooks(operation):
             if isinstance(operation, ChildlessOperation):
                 if self.debug:
-                    output = operation.__class__.__name__ \
-                        if not isinstance(operation, Text) else operation.short_text
+                    output = (
+                        operation.short_text
+                        if isinstance(operation, Text)
+                        else operation.__class__.__name__
+                    )
+
 
                     output = output.encode(errors="replace")
 

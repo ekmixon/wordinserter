@@ -28,4 +28,4 @@ def pprint(tokens, indent=0):
         else:
             print(pad + token.__class__.__name__)
             pprint(list(token), indent + 1)
-            print(pad + '/' + token.__class__.__name__)
+            print(f'{pad}/{token.__class__.__name__}')

@@ -39,11 +39,11 @@ if __name__ == "__main__":
         if file.name.endswith(".html"):
             print('- Handling {0}'.format(file.absolute()))
 
-            word_save = image_directory / (file.name + '.png')
-            word_save_temp = temp_directory / (file.name + '.png')
+            word_save = image_directory / f'{file.name}.png'
+            word_save_temp = temp_directory / f'{file.name}.png'
 
-            browser_save = image_directory / (file.name + '.html.png')
-            browser_save_temp = temp_directory / (file.name + '.html.png')
+            browser_save = image_directory / f'{file.name}.html.png'
+            browser_save_temp = temp_directory / f'{file.name}.html.png'
 
             subprocess.call(['wordinserter', str(file), '--close', '--save={save}'.format(save=word_save_temp)])
 

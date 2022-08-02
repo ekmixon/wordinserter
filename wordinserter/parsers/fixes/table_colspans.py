@@ -16,7 +16,7 @@ def normalize_table(table: Table):
         return
 
     max_table_cells = max(len(row.children) for row in table.children)
-    for row_idx, row in enumerate(table.children):
+    for row in table.children:
         children_with_colspan = [child for child in row.children if child.colspan > 1]
         colspan_left = max_table_cells - (len(row.children) - len(children_with_colspan))
 

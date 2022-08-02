@@ -70,8 +70,7 @@ class HTMLParser(BaseParser):
                         elements = parser.select(selector.selectorText)
                         for element in elements:
                             style = cssutils.parseStyle(element.attrs.get("style", ""))
-                            element_style = dict(style)
-                            element_style.update(rule_styles)
+                            element_style = dict(style) | rule_styles
                             for key, value in element_style.items():
                                 style[key] = value
                             element.attrs["style"] = style.getCssText(" ")
@@ -105,21 +104,24 @@ class HTMLParser(BaseParser):
 
         cls = MAPPING.get(element.name, IgnoredOperation)
 
-        style_attr = element.attrs.get('style')
-        if style_attr:
+        if style_attr := element.attrs.get('style'):
             element_style = cssutils.parseStyle(style_attr)
         else:
             element_style = None
 
         if cls is Image:
-            if not element.attrs.get("src", None):
-                cls = IgnoredOperation
-            else:
-                cls = partial(Image,
-                              height=int(element.attrs.get("height", 0)),
-                              width=int(element.attrs.get("width", 0)),
-                              caption=element.attrs.get("alt", None),
-                              location=element.attrs["src"])
+            cls = (
+                partial(
+                    Image,
+                    height=int(element.attrs.get("height", 0)),
+                    width=int(element.attrs.get("width", 0)),
+                    caption=element.attrs.get("alt", None),
+                    location=element.attrs["src"],
+                )
+                if element.attrs.get("src", None)
+                else IgnoredOperation
+            )
+
         elif cls is HyperLink:
             if "href" not in element.attrs:
                 cls = IgnoredOperation
@@ -156,7 +158,7 @@ class HTMLParser(BaseParser):
 
         instance = cls(attributes=element.attrs)
 
-        for idx, child in enumerate(element.children):
+        for child in element.children:
             item = self.build_element(child)
             if item is None:
                 continue
@@ -186,8 +188,7 @@ class HTMLParser(BaseParser):
         args = {}
 
         if 'class' in element.attrs:
-            vals = [v for v in element.attrs['class'] if v]
-            if vals:
+            if vals := [v for v in element.attrs['class'] if v]:
                 args["style"] = vals
 
         if style:
@@ -196,7 +197,7 @@ class HTMLParser(BaseParser):
 
             for style in style:
                 for nested_name in Format.NESTED_STYLES:
-                    nested_name_with_dash = nested_name + "-"
+                    nested_name_with_dash = f"{nested_name}-"
                     if style.name.startswith(nested_name_with_dash):
                         args[nested_name][style.name.replace(nested_name_with_dash, "")] = style.value
                         break

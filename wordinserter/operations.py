@@ -110,18 +110,12 @@ class Operation(object):
     @property
     def right_siblings(self):
         idx = self.parent.child_index(self)
-        if idx == (len(self.parent) - 1):
-            return None
-
-        return self.parent[idx+1:]
+        return None if idx == (len(self.parent) - 1) else self.parent[idx+1:]
     
     @property
     def left_siblings(self):
         idx = self.parent.child_index(self)
-        if idx == 0:
-            return None
-
-        return reversed(self.parent[:idx])
+        return None if idx == 0 else reversed(self.parent[:idx])
 
     @property
     def has_children(self):
@@ -212,11 +206,7 @@ class Text(ChildlessOperation):
 
     @property
     def short_text(self):
-        if len(self.text) > 10:
-            txt = self.text[:10] + "..."
-        else:
-            txt = self.text
-
+        txt = f"{self.text[:10]}..." if len(self.text) > 10 else self.text
         return repr(txt)
 
 
@@ -391,11 +381,11 @@ class BaseList(Operation):
 
     @property
     def depth(self):
-        return sum(1 for p in self.ancestors if isinstance(p, BaseList))
+        return sum(isinstance(p, BaseList) for p in self.ancestors)
 
     @property
     def sub_lists(self):
-        return sum(1 for p in self.children if isinstance(p, BaseList))
+        return sum(isinstance(p, BaseList) for p in self.children)
 
 
 class BulletList(BaseList):

@@ -42,7 +42,7 @@ def save_as_image(document, save_as, constants):
 
     temp_directory = pathlib.Path(tempfile.mkdtemp())
 
-    temp_pdf_name = temp_directory / (save_as.name + '.pdf')
+    temp_pdf_name = temp_directory / f'{save_as.name}.pdf'
 
     document.SaveAs2(
         FileName=str(temp_pdf_name.absolute()),

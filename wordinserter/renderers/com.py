@@ -28,7 +28,7 @@ class WordFormatter(object):
             if name in WORD_WDCOLORINDEX_MAPPING:
                 return getattr(constants, WORD_WDCOLORINDEX_MAPPING[name])
             # Try and get the color from the wdColors enumeration
-            return getattr(constants, "wd" + name.capitalize())
+            return getattr(constants, f"wd{name.capitalize()}")
         except (AttributeError, ValueError):
             return None
 
@@ -286,7 +286,7 @@ class COMRenderer(BaseRenderer):
             self.document.Hyperlinks.Add(Anchor=rng, TextToDisplay="", SubAddress=op.location.replace('#', '', 1))
         elif op.location.startswith('!') or op.location.startswith('@'):
             if op.location.startswith('!'):
-                text = "REF {} \h \* charformat".format(op.location.replace('!', '', 1))
+                text = f"REF {op.location.replace('!', '', 1)} \h \* charformat"
             else:
                 text = op.location.replace('@', '', 1)
                 code = text.split(' ')[0]
@@ -425,7 +425,7 @@ class COMRenderer(BaseRenderer):
 
         for row_index, row in enumerate(op):
             # Store the row object for later use. This cannot be used if the table has vertically merged cells
-            row.render.row_object = table.Rows(row_index+1) if not has_rowspan else None
+            row.render.row_object = None if has_rowspan else table.Rows(row_index+1)
 
             # Loop through each row and extract the corresponding Row object from Word
             row_cells = cell_mapping[row_index]
@@ -542,8 +542,8 @@ class COMRenderer(BaseRenderer):
 
     def render_operation(self, operation, *args, **kwargs):
         if operation.format is not None \
-                and operation.format.has_format() \
-                and operation.format.__class__ in self.render_methods:
+                    and operation.format.has_format() \
+                    and operation.format.__class__ in self.render_methods:
             format_func = self.collect_format_data
         else:
             format_func = self.ignored_element
